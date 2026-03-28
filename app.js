@@ -160,37 +160,120 @@ function compressImage(file) {
   });
 }
 
-// ================= FITUR RIWAYAT 16 KOLOM =================
+// ================= FITUR RIWAYAT MASTER-DETAIL =================
+let riwayatDataLokal = []; // Tempat menyimpan data sementara agar tidak loading terus saat klik detail
+
 async function muatRiwayatGuru() {
-  const tbody = document.getElementById('tbody-riwayat-guru');
-  tbody.innerHTML = `<tr><td colspan="16" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-blue-500 text-2xl mb-2"></i><br>Membuka laci arsip <b>${currentUser.userId}</b>...</td></tr>`;
+  const listContainer = document.getElementById('listRiwayatContainer');
+  const detailContainer = document.getElementById('detailRiwayatContainer');
+  
+  // Pastikan mode List terbuka, Detail tertutup
+  if(detailContainer) detailContainer.classList.add('hidden');
+  if(listContainer) {
+    listContainer.classList.remove('hidden');
+    listContainer.innerHTML = `<div class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-blue-500 text-2xl mb-2"></i><br>Membaca Arsip <b>${currentUser.userId}</b>...</div>`;
+  }
 
   try {
     const res = await fetchAPI('getRiwayatGuru', { userId: currentUser.userId });
-    tbody.innerHTML = '';
     
-    if (res.status === 'error') return tbody.innerHTML = `<tr><td colspan="16" class="text-center py-10 text-red-500 font-bold">${res.message}</td></tr>`;
-    if (!res.data || res.data.length === 0) return tbody.innerHTML = '<tr><td colspan="16" class="text-center py-10 text-gray-400 font-medium">Anda belum memiliki riwayat jurnal.</td></tr>';
+    if (res.status === 'error') return listContainer.innerHTML = `<div class="text-center py-10 text-red-500 font-bold">${res.message}</div>`;
+    if (!res.data || res.data.length === 0) return listContainer.innerHTML = '<div class="text-center py-10 text-gray-400 font-medium">Anda belum memiliki riwayat jurnal.</div>';
     
-    const buatLinkFoto = (url) => url ? `<a href="${url}" target="_blank" class="text-blue-500 underline font-semibold hover:text-blue-700">Lihat</a>` : `<span class="text-gray-300">-</span>`;
-
-    res.data.forEach(baris => {
-      let tr = document.createElement('tr');
-      tr.className = "hover:bg-blue-50 transition duration-150 whitespace-nowrap text-xs";
-      tr.innerHTML = `
-        <td class="px-3 py-2 border border-gray-200 font-mono text-blue-600">${baris[0] || '-'}</td>
-        <td class="px-3 py-2 border border-gray-200">${baris[1] || '-'}</td><td class="px-3 py-2 border border-gray-200">${baris[2] || '-'}</td>
-        <td class="px-3 py-2 border border-gray-200">${baris[3] || '-'}</td><td class="px-3 py-2 border border-gray-200 whitespace-normal min-w-[200px]">${baris[4] || '-'}</td>
-        <td class="px-3 py-2 border border-gray-200 whitespace-normal min-w-[200px]">${baris[5] || '-'}</td><td class="px-3 py-2 border border-gray-200">${baris[6] || '-'}</td>
-        <td class="px-3 py-2 border border-gray-200">${baris[7] || '-'}</td><td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[8])}</td>
-        <td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[9])}</td><td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[10])}</td>
-        <td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[11])}</td><td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[12])}</td>
-        <td class="px-3 py-2 border border-gray-200 text-center">${buatLinkFoto(baris[13])}</td><td class="px-3 py-2 border border-gray-200 text-center font-bold">${baris[14] || '0'}</td>
-        <td class="px-3 py-2 border border-gray-200 whitespace-normal min-w-[150px]">${baris[15] || '-'}</td>
+    riwayatDataLokal = res.data; // Simpan ke laci sementara
+    
+    // Membangun Tampilan List View (UI mirip Inbox)
+    let listHTML = '<ul class="divide-y divide-gray-100">';
+    riwayatDataLokal.forEach((baris, index) => {
+      // Indeks: baris[0]=ID, baris[1]=Tanggal, baris[2]=Bulan, baris[6]=Kelas
+      listHTML += `
+        <li class="p-4 hover:bg-blue-50 cursor-pointer transition flex justify-between items-center group" onclick="bukaDetailRiwayat(${index})">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-file-lines"></i></div>
+            <div>
+              <p class="text-md font-bold text-gray-800 group-hover:text-blue-600 transition">${baris[0] || '-'}</p>
+              <p class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${baris[1] || '-'} • Kelas: ${baris[6] || '-'}</p>
+            </div>
+          </div>
+          <div class="text-gray-300 group-hover:text-blue-500 transition"><i class="fa-solid fa-chevron-right"></i></div>
+        </li>
       `;
-      tbody.appendChild(tr);
     });
-  } catch(err) { tbody.innerHTML = `<tr><td colspan="16" class="text-center py-10 text-red-500 font-bold">${err.message}</td></tr>`; }
+    listHTML += '</ul>';
+    listContainer.innerHTML = listHTML;
+
+  } catch(err) { listContainer.innerHTML = `<div class="text-center py-10 text-red-500 font-bold">${err.message}</div>`; }
+}
+
+// Fungsi Membuka Dokumen Detail saat List diklik
+function bukaDetailRiwayat(index) {
+  const data = riwayatDataLokal[index];
+  const listContainer = document.getElementById('listRiwayatContainer');
+  const detailContainer = document.getElementById('detailRiwayatContainer');
+  
+  // Sembunyikan List, Tampilkan Detail
+  listContainer.classList.add('hidden');
+  detailContainer.classList.remove('hidden');
+
+  // Merakit Grid Foto
+  let fotoHTML = '';
+  // Loop indeks foto (indeks 8 sampai 13 di array)
+  for(let i = 8; i <= 13; i++) {
+    if(data[i]) {
+      fotoHTML += `
+        <div class="aspect-square border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm relative group cursor-pointer" onclick="window.open('${data[i]}', '_blank')">
+          <img src="${data[i]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center"><i class="fa-solid fa-magnifying-glass text-white opacity-0 group-hover:opacity-100 text-2xl drop-shadow-md"></i></div>
+        </div>`;
+    }
+  }
+  if(fotoHTML === '') fotoHTML = '<p class="text-sm text-gray-400 italic col-span-full">Tidak ada lampiran foto untuk laporan ini.</p>';
+
+  // Merakit Layout Persis Seperti Gambar Desain Anda
+  detailContainer.innerHTML = `
+    <div class="mb-6 flex justify-between items-start border-b border-gray-100 pb-4">
+       <div>
+         <h3 class="text-2xl font-bold text-gray-800">Detail Riwayat Jurnal</h3>
+         <p class="text-sm text-gray-500 mt-1">ID Laporan : <span class="font-mono text-blue-600 font-bold">${data[0]}</span></p>
+       </div>
+       <button onclick="kembaliKeList()" class="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali</button>
+    </div>
+
+    <div class="space-y-8">
+      <div>
+        <h4 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-500 pl-3">Data Waktu</h4>
+        <div class="grid grid-cols-[140px_10px_1fr] gap-y-3 text-sm text-gray-700 ml-2">
+          <div class="font-medium">Tanggal</div><div>:</div><div class="font-semibold">${data[1]}</div>
+          <div class="font-medium">Bulan</div><div>:</div><div>${data[2]}</div>
+          <div class="font-medium">Tahun Ajaran</div><div>:</div><div>${data[3]}</div>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-500 pl-3">Data Pelajaran</h4>
+        <div class="grid grid-cols-[140px_10px_1fr] gap-y-3 text-sm text-gray-700 ml-2">
+          <div class="font-medium">Kelas</div><div>:</div><div class="font-semibold">${data[6]}</div>
+          <div class="font-medium">Capaian (CP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[4]}</div>
+          <div class="font-medium">Tujuan (TP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[5]}</div>
+          <div class="font-medium">Mode</div><div>:</div><div>${data[7]}</div>
+          <div class="font-medium">Volume</div><div>:</div><div>${data[14] || '0'} Jam Pelajaran</div>
+          <div class="font-medium">Keterangan</div><div>:</div><div class="whitespace-pre-wrap text-red-500 font-medium">${data[15] || '-'}</div>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-500 pl-3">Lampiran Foto</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 ml-2">
+          ${fotoHTML}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function kembaliKeList() {
+  document.getElementById('listRiwayatContainer').classList.remove('hidden');
+  document.getElementById('detailRiwayatContainer').classList.add('hidden');
 }
 
 async function muatDataAdmin() {
