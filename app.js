@@ -1,5 +1,5 @@
 // ================= PENGATURAN KONEKSI (UBAH URL INI) =================
-const API_URL = "https://script.google.com/macros/s/AKfycbx8qg9xnD8BR688VWkmURca9Hj9S6phI2_pHh3n4QcSpb0QgCtTdt6FIZnf99lwMYxuyQ/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxG3gloRxNZWcM8bk4xS0QE2RUNWgDJd9Y9tE7vSTf8wW5-0ci45q0ZFqvzybOo4awV/exec"; 
 const SECRET_TOKEN = "GAS_MASTER_PRO_2026_NASIONAL"; // Harus sama dengan di Backend
 
 let currentUser = JSON.parse(localStorage.getItem('userEJournal')) || null;
@@ -116,6 +116,7 @@ function tampilkanPreview(inputElement) {
   }
 }
 
+// ================= 1. FUNGSI SUBMIT (Ditambah Materi & PertemuanKe) =================
 async function submitJurnal() {
   const rawTgl = document.getElementById('fTanggal').value;
   if(!rawTgl) return Swal.fire('Oops...', 'Tanggal wajib diisi!', 'warning');
@@ -134,8 +135,20 @@ async function submitJurnal() {
     }
   }
 
+  // Payload Baru Sesuai Form
   const payload = {
-    userId: currentUser.userId, tanggal: formatTanggalIndo(rawTgl), bulan: document.getElementById('fBulan').value, tahunAjaran: document.getElementById('fTahunAjaran').value, cp: document.getElementById('fCP').value, tp: document.getElementById('fTP').value, kelas: document.getElementById('fKelas').value, nonTatapMuka: document.getElementById('fNonTatapMuka').value, volume: document.getElementById('fVolume').value, keterangan: document.getElementById('fKeterangan').value, fotoData: fotoDataArray
+    userId: currentUser.userId, 
+    tanggal: formatTanggalIndo(rawTgl), 
+    bulan: document.getElementById('fBulan').value, 
+    tahunAjaran: document.getElementById('fTahunAjaran').value, 
+    materi: document.getElementById('fMateri').value, // Baru
+    cp: document.getElementById('fCP').value, 
+    tp: document.getElementById('fTP').value, 
+    kelas: document.getElementById('fKelas').value, 
+    nonTatapMuka: document.getElementById('fNonTatapMuka').value, 
+    pertemuanKe: document.getElementById('fPertemuanKe').value, // Baru
+    keterangan: document.getElementById('fKeterangan').value, 
+    fotoData: fotoDataArray
   };
 
   btn.innerHTML = '<i class="fa-solid fa-satellite-dish fa-beat"></i> Mengirim Data...';
@@ -157,29 +170,11 @@ async function submitJurnal() {
   }
 }
 
-function compressImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader(); reader.readAsDataURL(file);
-    reader.onload = event => {
-      const img = new Image(); img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scaleSize = 800 / img.width; canvas.width = 800; canvas.height = img.height * scaleSize;
-        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6));
-      };
-    }; reader.onerror = error => reject(error);
-  });
-}
-
-// ================= FITUR RIWAYAT MASTER-DETAIL =================
-let riwayatDataLokal = []; // Tempat menyimpan data sementara agar tidak loading terus saat klik detail
-
+// ================= 2. FUNGSI LIST RIWAYAT (Geser Indeks Kelas) =================
 async function muatRiwayatGuru() {
   const listContainer = document.getElementById('listRiwayatContainer');
   const detailContainer = document.getElementById('detailRiwayatContainer');
   
-  // Pastikan mode List terbuka, Detail tertutup
   if(detailContainer) detailContainer.classList.add('hidden');
   if(listContainer) {
     listContainer.classList.remove('hidden');
@@ -188,23 +183,21 @@ async function muatRiwayatGuru() {
 
   try {
     const res = await fetchAPI('getRiwayatGuru', { userId: currentUser.userId });
-    
     if (res.status === 'error') return listContainer.innerHTML = `<div class="text-center py-10 text-red-500 font-bold">${res.message}</div>`;
     if (!res.data || res.data.length === 0) return listContainer.innerHTML = '<div class="text-center py-10 text-gray-400 font-medium">Anda belum memiliki riwayat jurnal.</div>';
     
-    riwayatDataLokal = res.data; // Simpan ke laci sementara
+    riwayatDataLokal = res.data; 
     
-    // Membangun Tampilan List View (UI mirip Inbox)
     let listHTML = '<ul class="divide-y divide-gray-100">';
     riwayatDataLokal.forEach((baris, index) => {
-      // Indeks: baris[0]=ID, baris[1]=Tanggal, baris[2]=Bulan, baris[6]=Kelas
+      // PERHATIAN: Indeks Kelas sekarang bergeser ke-7 karena ada Materi (di indeks 4)
       listHTML += `
         <li class="p-4 hover:bg-blue-50 cursor-pointer transition flex justify-between items-center group" onclick="bukaDetailRiwayat(${index})">
           <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-file-lines"></i></div>
             <div>
               <p class="text-md font-bold text-gray-800 group-hover:text-blue-600 transition">${baris[0] || '-'}</p>
-              <p class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${baris[1] || '-'} • Kelas: ${baris[6] || '-'}</p>
+              <p class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${baris[1] || '-'} • Kelas: ${baris[7] || '-'}</p>
             </div>
           </div>
           <div class="text-gray-300 group-hover:text-blue-500 transition"><i class="fa-solid fa-chevron-right"></i></div>
@@ -217,35 +210,20 @@ async function muatRiwayatGuru() {
   } catch(err) { listContainer.innerHTML = `<div class="text-center py-10 text-red-500 font-bold">${err.message}</div>`; }
 }
 
-// Fungsi Bantuan untuk mengubah Link Drive biasa menjadi Link Gambar Langsung (Thumbnail)
-function ubahUrlDriveKeGambar(url) {
-  if (!url) return '';
-  // Mengekstrak ID unik file dari link Google Drive
-  const match = url.match(/\/d\/(.+?)\//);
-  if (match && match[1]) {
-    // Menggunakan endpoint thumbnail Drive agar loading cepat dan tidak diblokir CORS
-    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
-  }
-  return url; 
-}
-
-// Fungsi Membuka Dokumen Detail saat List diklik
+// ================= 3. FUNGSI DETAIL RIWAYAT (17 Kolom) =================
 function bukaDetailRiwayat(index) {
   const data = riwayatDataLokal[index];
   const listContainer = document.getElementById('listRiwayatContainer');
   const detailContainer = document.getElementById('detailRiwayatContainer');
   
-  // Sembunyikan List, Tampilkan Detail
   listContainer.classList.add('hidden');
   detailContainer.classList.remove('hidden');
 
-  // Merakit Grid Foto dengan Kacamata Pintar (ubahUrlDriveKeGambar)
   let fotoHTML = '';
-  // Loop indeks foto (indeks 8 sampai 13 di array)
-  for(let i = 8; i <= 13; i++) {
+  // FOTO SEKARANG BERGESER KE INDEKS 9 sampai 14 (Karena ada kolom Materi)
+  for(let i = 9; i <= 14; i++) {
     if(data[i] && data[i].trim() !== '') {
-      const gambarLangsung = ubahUrlDriveKeGambar(data[i]); // <--- KUNCI PERBAIKANNYA DI SINI
-      
+      const gambarLangsung = ubahUrlDriveKeGambar(data[i]);
       fotoHTML += `
         <div class="aspect-square border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm relative group cursor-pointer" onclick="window.open('${data[i]}', '_blank')">
           <img src="${gambarLangsung}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Gagal+Muat';">
@@ -255,7 +233,6 @@ function bukaDetailRiwayat(index) {
   }
   if(fotoHTML === '') fotoHTML = '<p class="text-sm text-gray-400 italic col-span-full">Tidak ada lampiran foto untuk laporan ini.</p>';
 
-  // Merakit Layout Persis Seperti Gambar Desain Anda
   detailContainer.innerHTML = `
     <div class="mb-6 flex justify-between items-start border-b border-gray-100 pb-4">
        <div>
@@ -278,12 +255,13 @@ function bukaDetailRiwayat(index) {
       <div>
         <h4 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-indigo-500 pl-3">Data Pelajaran</h4>
         <div class="grid grid-cols-[140px_10px_1fr] gap-y-3 text-sm text-gray-700 ml-2">
-          <div class="font-medium">Kelas</div><div>:</div><div class="font-semibold">${data[6]}</div>
-          <div class="font-medium">Capaian (CP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[4]}</div>
-          <div class="font-medium">Tujuan (TP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[5]}</div>
-          <div class="font-medium">Mode</div><div>:</div><div>${data[7]}</div>
-          <div class="font-medium">Volume</div><div>:</div><div>${data[14] || '0'} Jam Pelajaran</div>
-          <div class="font-medium">Keterangan</div><div>:</div><div class="whitespace-pre-wrap text-red-500 font-medium">${data[15] || '-'}</div>
+          <div class="font-medium">Kelas</div><div>:</div><div class="font-semibold">${data[7]}</div>
+          <div class="font-medium">Materi</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed font-bold text-gray-800">${data[4]}</div>
+          <div class="font-medium">Capaian (CP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[5]}</div>
+          <div class="font-medium">Tujuan (TP)</div><div>:</div><div class="whitespace-pre-wrap leading-relaxed">${data[6]}</div>
+          <div class="font-medium">Mode</div><div>:</div><div>${data[8]}</div>
+          <div class="font-medium">Pertemuan Ke</div><div>:</div><div><span class="bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded">${data[15] || '-'}</span></div>
+          <div class="font-medium">Keterangan</div><div>:</div><div class="whitespace-pre-wrap text-red-500 font-medium">${data[16] || '-'}</div>
         </div>
       </div>
 
