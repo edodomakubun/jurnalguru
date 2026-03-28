@@ -205,6 +205,18 @@ async function muatRiwayatGuru() {
   } catch(err) { listContainer.innerHTML = `<div class="text-center py-10 text-red-500 font-bold">${err.message}</div>`; }
 }
 
+// Fungsi Bantuan untuk mengubah Link Drive biasa menjadi Link Gambar Langsung (Thumbnail)
+function ubahUrlDriveKeGambar(url) {
+  if (!url) return '';
+  // Mengekstrak ID unik file dari link Google Drive
+  const match = url.match(/\/d\/(.+?)\//);
+  if (match && match[1]) {
+    // Menggunakan endpoint thumbnail Drive agar loading cepat dan tidak diblokir CORS
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
+  }
+  return url; 
+}
+
 // Fungsi Membuka Dokumen Detail saat List diklik
 function bukaDetailRiwayat(index) {
   const data = riwayatDataLokal[index];
@@ -215,14 +227,16 @@ function bukaDetailRiwayat(index) {
   listContainer.classList.add('hidden');
   detailContainer.classList.remove('hidden');
 
-  // Merakit Grid Foto
+  // Merakit Grid Foto dengan Kacamata Pintar (ubahUrlDriveKeGambar)
   let fotoHTML = '';
   // Loop indeks foto (indeks 8 sampai 13 di array)
   for(let i = 8; i <= 13; i++) {
-    if(data[i]) {
+    if(data[i] && data[i].trim() !== '') {
+      const gambarLangsung = ubahUrlDriveKeGambar(data[i]); // <--- KUNCI PERBAIKANNYA DI SINI
+      
       fotoHTML += `
         <div class="aspect-square border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm relative group cursor-pointer" onclick="window.open('${data[i]}', '_blank')">
-          <img src="${data[i]}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          <img src="${gambarLangsung}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Gagal+Muat';">
           <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center"><i class="fa-solid fa-magnifying-glass text-white opacity-0 group-hover:opacity-100 text-2xl drop-shadow-md"></i></div>
         </div>`;
     }
