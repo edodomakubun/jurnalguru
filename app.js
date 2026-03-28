@@ -70,11 +70,28 @@ function renderMenu() {
   }
 }
 
+// Fungsi Pergantian Halaman & Trigger Otomatis
 function bukaHalaman(halamanId) {
+  // 1. Render template HTML ke area konten
   document.getElementById('contentArea').innerHTML = document.getElementById(`tpl-${halamanId}`).innerHTML;
-  if(halamanId === 'riwayat-guru') muatRiwayatGuru();
-  if(halamanId === 'dashboard-admin') muatDataAdmin();
-  if(window.innerWidth < 768) toggleSidebar(); 
+  
+  // 2. LOGIKA BARU: Jika yang dibuka adalah Form, setel Bulan otomatis!
+  if (halamanId === 'form-jurnal') {
+    const arrayBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const bulanSekarang = arrayBulan[new Date().getMonth()]; // Mendapatkan indeks bulan saat ini dari sistem
+    const elemenBulan = document.getElementById('fBulan');
+    
+    if (elemenBulan) {
+      elemenBulan.value = bulanSekarang; // Mengunci pilihan dropdown ke bulan berjalan
+    }
+  }
+
+  // 3. Panggil fungsi lanjutan jika membuka riwayat atau admin
+  if (halamanId === 'riwayat-guru') muatRiwayatGuru();
+  if (halamanId === 'dashboard-admin') muatDataAdmin();
+  
+  // 4. Tutup sidebar jika di HP
+  if (window.innerWidth < 768) toggleSidebar(); 
 }
 
 function toggleSidebar() {
