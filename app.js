@@ -211,6 +211,18 @@ async function muatRiwayatGuru() {
 }
 
 // ================= 3. FUNGSI DETAIL RIWAYAT (17 Kolom) =================
+
+// KACAMATA PINTAR (Wajib ada agar tidak ReferenceError)
+function ubahUrlDriveKeGambar(url) {
+  if (!url) return '';
+  const match = url.match(/\/d\/(.+?)\//);
+  if (match && match[1]) {
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
+  }
+  return url; 
+}
+
+// Fungsi Buka Detail
 function bukaDetailRiwayat(index) {
   const data = riwayatDataLokal[index];
   const listContainer = document.getElementById('listRiwayatContainer');
@@ -220,10 +232,12 @@ function bukaDetailRiwayat(index) {
   detailContainer.classList.remove('hidden');
 
   let fotoHTML = '';
-  // FOTO SEKARANG BERGESER KE INDEKS 9 sampai 14 (Karena ada kolom Materi)
+  // Loop Foto di Indeks 9 sampai 14
   for(let i = 9; i <= 14; i++) {
     if(data[i] && data[i].trim() !== '') {
+      // Memanggil fungsi kacamata pintar di sini
       const gambarLangsung = ubahUrlDriveKeGambar(data[i]);
+      
       fotoHTML += `
         <div class="aspect-square border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm relative group cursor-pointer" onclick="window.open('${data[i]}', '_blank')">
           <img src="${gambarLangsung}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Gagal+Muat';">
@@ -275,6 +289,7 @@ function bukaDetailRiwayat(index) {
   `;
 }
 
+// Fungsi Navigasi Kembali
 function kembaliKeList() {
   document.getElementById('listRiwayatContainer').classList.remove('hidden');
   document.getElementById('detailRiwayatContainer').classList.add('hidden');
