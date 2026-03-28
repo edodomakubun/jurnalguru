@@ -22,27 +22,114 @@
 </head>
 <body class="text-gray-800 antialiased overflow-hidden h-screen flex">
 
-  <div id="appRoot" class="w-full h-full flex">
-    <div id="loginScreen" class="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 to-indigo-800">
-      <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md text-center fade-in">
-        <div class="bg-blue-100 text-blue-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fa-solid fa-book-open text-4xl"></i></div>
-        <h2 class="text-3xl font-bold mb-2">E-Jurnal Guru</h2>
-        <p class="text-gray-500 mb-8 text-sm">Portal Nasional (Cloud Server)</p>
-        <div class="space-y-4 text-left">
-          <div><label class="block text-sm font-semibold mb-1">ID Pengguna</label><input type="text" id="userId" placeholder="G001" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"></div>
-          <div><label class="block text-sm font-semibold mb-1">PIN Rahasia</label><input type="password" id="pin" placeholder="••••••" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"></div>
-          <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg mt-4"><i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk Sistem</button>
-        </div>
+  <div id="loginScreen" class="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 to-indigo-800">
+    <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md text-center fade-in">
+      <div class="bg-blue-100 text-blue-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fa-solid fa-book-open text-4xl"></i></div>
+      <h2 class="text-3xl font-bold mb-2">E-Jurnal Guru</h2>
+      <p class="text-gray-500 mb-8 text-sm">Portal Nasional (Cloud Server)</p>
+      <div class="space-y-4 text-left">
+        <div><label class="block text-sm font-semibold mb-1">ID Pengguna</label><input type="text" id="userId" placeholder="G001" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+        <div><label class="block text-sm font-semibold mb-1">PIN Rahasia</label><input type="password" id="pin" placeholder="••••••" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
+        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg mt-4 transition"><i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk Sistem</button>
       </div>
     </div>
   </div>
 
+  <aside id="sidebar" class="hidden w-64 bg-white shadow-xl flex-col justify-between h-full z-40">
+    <div>
+      <div class="p-6 border-b border-gray-100 flex items-center gap-3"><div class="bg-blue-600 text-white p-2 rounded-lg"><i class="fa-solid fa-book-open"></i></div><h1 class="text-xl font-bold text-gray-800">E-Jurnal</h1></div>
+      <div class="p-4"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Menu Utama</p><ul class="space-y-2" id="menuList"></ul></div>
+    </div>
+    <div class="p-4 border-t border-gray-100 bg-gray-50">
+      <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold" id="userInitial">A</div><div><p class="text-sm font-bold text-gray-800" id="userName">User</p><p class="text-xs text-gray-500" id="userRole">Role</p></div></div>
+      <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-600 font-semibold hover:bg-red-50 rounded-lg transition"><i class="fa-solid fa-power-off mr-2"></i> Keluar</button>
+    </div>
+  </aside>
+
+  <main id="mainContent" class="hidden flex-1 flex-col h-full overflow-y-auto bg-gray-50 relative">
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center md:hidden sticky top-0 z-30"><h1 class="text-lg font-bold"><i class="fa-solid fa-book-open text-blue-600 mr-2"></i> E-Jurnal</h1><button onclick="toggleSidebar()"><i class="fa-solid fa-bars text-xl"></i></button></header>
+    <div class="p-6 md:p-10 max-w-6xl mx-auto w-full fade-in" id="contentArea"></div>
+  </main>
+
+  <template id="tpl-form-jurnal">
+    <div class="mb-6"><h2 class="text-2xl font-bold text-gray-800">Tulis Jurnal Harian</h2></div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-blue-50 p-4 rounded-lg md:col-span-2 flex flex-col md:flex-row gap-4 border border-blue-100">
+           <div class="flex-1"><label class="block text-xs font-semibold text-blue-800 uppercase mb-1">Tanggal</label><input type="date" id="fTanggal" class="w-full p-2.5 border-none rounded-md focus:ring-2 focus:ring-blue-500"></div>
+          <div class="flex-1"><label class="block text-xs font-semibold text-blue-800 uppercase mb-1">Bulan</label><select id="fBulan" class="w-full p-2.5 border-none rounded-md focus:ring-2 focus:ring-blue-500"><option value="Januari">Januari</option><option value="Februari">Februari</option><option value="Maret">Maret</option><option value="April">April</option><option value="Mei">Mei</option><option value="Juni">Juni</option><option value="Juli">Juli</option><option value="Agustus">Agustus</option><option value="September">September</option><option value="Oktober">Oktober</option><option value="November">November</option><option value="Desember">Desember</option></select></div>
+          <div class="flex-1"><label class="block text-xs font-semibold text-blue-800 uppercase mb-1">Tahun Ajaran</label><select id="fTahunAjaran" class="w-full p-2.5 border-none rounded-md focus:ring-2 focus:ring-blue-500"><option value="2025/2026">2025/2026</option><option value="2026/2027">2026/2027</option><option value="2027/2028">2027/2028</option></select></div>
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-1">Kelas</label><input type="text" id="fKelas" placeholder="Misal: X MIPA 1" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"></div>
+        <div class="flex gap-4">
+          <div class="w-1/2"><label class="block text-sm font-semibold text-gray-700 mb-1">Volume (JP)</label><input type="number" id="fVolume" placeholder="2" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"></div>
+          <div class="w-1/2"><label class="block text-sm font-semibold text-gray-700 mb-1">Mode</label><select id="fNonTatapMuka" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"><option value="Tatap Muka">Tatap Muka</option><option value="Non Tatap Muka (Daring)">Daring</option></select></div>
+        </div>
+        <div class="md:col-span-2"><label class="block text-sm font-semibold text-gray-700 mb-1">Capaian Pembelajaran (CP)</label><textarea id="fCP" rows="2" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
+        <div class="md:col-span-2"><label class="block text-sm font-semibold text-gray-700 mb-1">Tujuan Pembelajaran (TP)</label><textarea id="fTP" rows="2" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
+        <div class="md:col-span-2"><label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan / Presensi</label><textarea id="fKeterangan" rows="2" placeholder="Siswa absen, izin, dll..." class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"></textarea></div>
+        
+        <div class="md:col-span-2 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition">
+          <i class="fa-solid fa-camera-retro text-4xl text-blue-400 mb-3"></i>
+          <label class="block text-sm font-semibold text-gray-700 mb-2 cursor-pointer">Pilih & Unggah Foto (Maks 6)</label>
+          <input type="file" id="fFoto" accept="image/*" multiple onchange="tampilkanPreview(this)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mx-auto cursor-pointer">
+          <div id="previewArea" class="flex flex-wrap justify-center gap-3 mt-4"></div>
+        </div>
+      </div>
+      <button onclick="submitJurnal()" id="btnSubmit" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition"><i class="fa-solid fa-paper-plane"></i> Kirim Laporan Jurnal</button>
+    </div>
+  </template>
+
+  <template id="tpl-riwayat-guru">
+    <div class="mb-6 flex justify-between items-end">
+      <div><h2 class="text-2xl font-bold text-gray-800">Riwayat Jurnal Anda</h2><p class="text-xs text-red-500 mt-1">*Geser tabel ke kanan untuk melihat 16 Kolom</p></div>
+      <button onclick="muatRiwayatGuru()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-rotate-right mr-1"></i> Segarkan</button>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto table-container">
+        <table class="w-full text-left text-sm text-gray-600 min-w-max border-collapse">
+          <thead class="bg-gray-800 text-white uppercase font-semibold text-xs whitespace-nowrap">
+            <tr>
+              <th class="px-3 py-3 border border-gray-600">ID_Laporan</th><th class="px-3 py-3 border border-gray-600">Tanggal</th>
+              <th class="px-3 py-3 border border-gray-600">Bulan</th><th class="px-3 py-3 border border-gray-600">Tahun Ajaran</th>
+              <th class="px-3 py-3 border border-gray-600">CP</th><th class="px-3 py-3 border border-gray-600">TP</th>
+              <th class="px-3 py-3 border border-gray-600">Kelas</th><th class="px-3 py-3 border border-gray-600">Non_Tatap_Muka</th>
+              <th class="px-3 py-3 border border-gray-600">Foto 1</th><th class="px-3 py-3 border border-gray-600">Foto 2</th>
+              <th class="px-3 py-3 border border-gray-600">Foto 3</th><th class="px-3 py-3 border border-gray-600">Foto 4</th>
+              <th class="px-3 py-3 border border-gray-600">Foto 5</th><th class="px-3 py-3 border border-gray-600">Foto 6</th>
+              <th class="px-3 py-3 border border-gray-600">Vol</th><th class="px-3 py-3 border border-gray-600">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-riwayat-guru" class="divide-y divide-gray-200">
+            <tr><td colspan="16" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-blue-500 text-2xl mb-2"></i><br>Membuka Laci Pusat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-dashboard-admin">
+    <div class="mb-6 flex justify-between items-end">
+      <div><h2 class="text-2xl font-bold text-gray-800">Dashboard Monitor</h2></div>
+      <button onclick="muatDataAdmin()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-700 transition"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Tarik Data</button>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto table-container">
+        <table class="w-full text-left text-sm text-gray-600 min-w-max">
+          <thead class="bg-indigo-50 border-b text-indigo-900 uppercase font-bold text-xs">
+            <tr><th class="px-4 py-3">Guru</th><th class="px-4 py-3">Waktu & Kelas</th><th class="px-4 py-3">Mode & Vol</th><th class="px-4 py-3">CP & TP</th><th class="px-4 py-3">Keterangan</th></tr>
+          </thead>
+          <tbody id="tbody-admin" class="divide-y divide-gray-100">
+            <tr><td colspan="5" class="text-center py-10"><i class="fa-solid fa-satellite-dish fa-beat text-indigo-500 text-3xl mb-3"></i><br>Sinkronisasi...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
   <script src="app.js"></script>
   <script>
-    // Mendaftarkan Service Worker untuk PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); });
-    }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); }); }
   </script>
 </body>
 </html>
