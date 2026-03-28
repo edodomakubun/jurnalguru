@@ -22,18 +22,64 @@
 </head>
 <body class="text-gray-800 antialiased overflow-hidden h-screen flex">
 
-  <div id="loginScreen" class="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 to-indigo-800">
-    <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md text-center fade-in">
-      <div class="bg-blue-100 text-blue-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fa-solid fa-book-open text-4xl"></i></div>
-      <h2 class="text-3xl font-bold mb-2">E-Jurnal Guru</h2>
-      <p class="text-gray-500 mb-8 text-sm">Portal Nasional (Cloud Server)</p>
-      <div class="space-y-4 text-left">
-        <div><label class="block text-sm font-semibold mb-1">ID Pengguna</label><input type="text" id="userId" placeholder="G001" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
-        <div><label class="block text-sm font-semibold mb-1">PIN Rahasia</label><input type="password" id="pin" placeholder="••••••" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
-        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg mt-4 transition"><i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk Sistem</button>
+<div id="loginScreen" class="absolute inset-0 z-50 min-h-screen bg-[#f8faff] flex flex-col justify-between fade-in overflow-y-auto">
+      
+      <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 p-6 md:p-12 items-center flex-grow">
+        
+        <div class="flex flex-col justify-center order-2 lg:order-1 mt-8 lg:mt-0">
+          <h1 class="text-4xl lg:text-[3.25rem] font-extrabold text-slate-800 leading-tight tracking-tight mb-4 lg:mb-6">
+            Melakukan<br>Jurnaling manajemen yang terarah
+          </h1>
+          <p class="text-sm lg:text-base text-slate-500 uppercase tracking-widest font-semibold mb-8 lg:mb-10">
+            SD INPRES LELINGLUAN
+          </p>
+          
+          <div class="rounded-2xl overflow-hidden shadow-2xl relative max-w-lg group">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7fRJe9SVBEej0swcVC4DM7hCsCrH-RTrh8f7bjetyGiuwXQ3DV6bvM2f-gEsF67S5Tlh7-VM-zLbuc_nR5X-VRsdqgILF_qUBhC8EG6getFTTbI4xJkPJRxFPf2UbibB2KyYwVt1_nnvNITK3Q3oNfyxU4nxTc7aGiASXRbiUWf31i5nKThNzZTZGQ5P5/s1280/img1.jpeg" 
+                 alt="SD Inpres Lelingluan" 
+                 class="w-full h-auto object-cover group-hover:scale-105 transition duration-700 ease-in-out">
+            <div class="absolute inset-0 bg-blue-900 bg-opacity-0 group-hover:bg-opacity-10 transition duration-700"></div>
+          </div>
+        </div>
+
+        <div class="flex justify-center lg:justify-end order-1 lg:order-2 w-full">
+          <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-md border border-slate-100 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-16 h-1 bg-blue-600"></div>
+
+            <h2 class="text-2xl md:text-3xl font-bold mb-3 text-slate-800 leading-snug">Selamat Datang di<br>E-Jurnal anda</h2>
+            <p class="text-slate-500 mb-10 text-sm font-medium">Masuk ke sistem dengan menggunakan ID dan PIN anda.</p>
+
+            <div class="space-y-6 text-left">
+              <div>
+                <label class="block text-[0.65rem] font-extrabold text-slate-500 uppercase tracking-widest mb-2">Masukan ID Anda</label>
+                <input type="text" id="userId" placeholder="G001" class="w-full p-4 bg-[#f0f3f8] border-none rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold text-slate-700">
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="block text-[0.65rem] font-extrabold text-slate-500 uppercase tracking-widest">Masukan PIN Anda</label>
+                  <span class="text-[0.65rem] font-extrabold text-blue-600 hover:text-blue-800 cursor-pointer">Lupa PIN?</span>
+                </div>
+                <input type="password" id="pin" placeholder="••••••••" class="w-full p-4 bg-[#f0f3f8] border-none rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold text-slate-700">
+              </div>
+              
+              <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-[#0a46c7] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition duration-300 mt-2 flex justify-center items-center gap-2">
+                LOGIN <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+              <p class="text-[0.75rem] text-slate-500 font-medium">Butuh bantuan akses? <span class="text-blue-600 font-bold cursor-pointer">Hubungi Administrator</span></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="w-full p-6 text-left hidden lg:block">
+        <p class="text-[0.7rem] text-slate-400 font-bold uppercase tracking-widest">@Copyright by Edward Domakubun</p>
       </div>
     </div>
-  </div>
 
   <aside id="sidebar" class="hidden w-64 bg-white shadow-xl flex-col justify-between h-full z-40">
     <div>
