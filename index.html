@@ -80,32 +80,20 @@
     </div>
   </template>
 
-  <template id="tpl-riwayat-guru">
+<template id="tpl-riwayat-guru">
     <div class="mb-6 flex justify-between items-end">
-      <div><h2 class="text-2xl font-bold text-gray-800">Riwayat Jurnal Anda</h2><p class="text-xs text-red-500 mt-1">*Geser tabel ke kanan untuk melihat 16 Kolom</p></div>
-      <button onclick="muatRiwayatGuru()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-rotate-right mr-1"></i> Segarkan</button>
-    </div>
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div class="overflow-x-auto table-container">
-        <table class="w-full text-left text-sm text-gray-600 min-w-max border-collapse">
-          <thead class="bg-gray-800 text-white uppercase font-semibold text-xs whitespace-nowrap">
-            <tr>
-              <th class="px-3 py-3 border border-gray-600">ID_Laporan</th><th class="px-3 py-3 border border-gray-600">Tanggal</th>
-              <th class="px-3 py-3 border border-gray-600">Bulan</th><th class="px-3 py-3 border border-gray-600">Tahun Ajaran</th>
-              <th class="px-3 py-3 border border-gray-600">CP</th><th class="px-3 py-3 border border-gray-600">TP</th>
-              <th class="px-3 py-3 border border-gray-600">Kelas</th><th class="px-3 py-3 border border-gray-600">Non_Tatap_Muka</th>
-              <th class="px-3 py-3 border border-gray-600">Foto 1</th><th class="px-3 py-3 border border-gray-600">Foto 2</th>
-              <th class="px-3 py-3 border border-gray-600">Foto 3</th><th class="px-3 py-3 border border-gray-600">Foto 4</th>
-              <th class="px-3 py-3 border border-gray-600">Foto 5</th><th class="px-3 py-3 border border-gray-600">Foto 6</th>
-              <th class="px-3 py-3 border border-gray-600">Vol</th><th class="px-3 py-3 border border-gray-600">Keterangan</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-riwayat-guru" class="divide-y divide-gray-200">
-            <tr><td colspan="16" class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-blue-500 text-2xl mb-2"></i><br>Membuka Laci Pusat...</td></tr>
-          </tbody>
-        </table>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Riwayat Jurnal Anda</h2>
+        <p class="text-sm text-gray-500 mt-1">Klik pada laporan untuk melihat detail.</p>
       </div>
+      <button onclick="muatRiwayatGuru()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition"><i class="fa-solid fa-rotate-right mr-1"></i> Segarkan</button>
     </div>
+
+    <div id="listRiwayatContainer" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      </div>
+
+    <div id="detailRiwayatContainer" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 fade-in">
+      </div>
   </template>
 
   <template id="tpl-dashboard-admin">
