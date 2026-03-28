@@ -196,7 +196,7 @@ async function muatRiwayatGuru() {
           <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-file-lines"></i></div>
             <div>
-              <p class="text-md font-bold text-gray-800 group-hover:text-blue-600 transition">${baris[0] || '-'}</p>
+              <p class="text-md font-bold text-gray-800 group-hover:text-blue-600 transition">${baris[4] || '-'}</p>
               <p class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-calendar mr-1"></i> ${baris[1] || '-'} • Kelas: ${baris[7] || '-'}</p>
             </div>
           </div>
