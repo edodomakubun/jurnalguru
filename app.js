@@ -82,12 +82,24 @@ function toggleSidebar() {
   sb.classList.toggle('hidden'); sb.classList.toggle('absolute'); sb.classList.toggle('h-full');
 }
 
-// ================= FITUR GURU =================
+// ================= FITUR PENERJEMAH TANGGAL (UPDATE ZERO-PADDING 'dd') =================
 function formatTanggalIndo(dateString) {
   const d = new Date(dateString);
+  
+  // Array kamus Hari dan Bulan
   const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
   const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  return `${hari[d.getDay()]}, ${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+  
+  // Ekstraksi komponen waktu
+  const namaHari = hari[d.getDay()];
+  const namaBulan = bulan[d.getMonth()];
+  const tahun = d.getFullYear();
+  
+  // KUNCI PERBAIKAN: Memaksa tanggal menjadi 2 digit (dd). Jika tanggal 5, menjadi 05.
+  const tanggalLengkap = String(d.getDate()).padStart(2, '0');
+  
+  // Menggabungkan sesuai format pesanan: Hari, dd Bulan yyyy
+  return `${namaHari}, ${tanggalLengkap} ${namaBulan} ${tahun}`;
 }
 
 function tampilkanPreview(inputElement) {
