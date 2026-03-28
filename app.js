@@ -1,5 +1,5 @@
 // ================= PENGATURAN KONEKSI (UBAH URL INI) =================
-const API_URL = "YOUR_WEB_APP_URL_HERE"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbx8qg9xnD8BR688VWkmURca9Hj9S6phI2_pHh3n4QcSpb0QgCtTdt6FIZnf99lwMYxuyQ/exec"; 
 const SECRET_TOKEN = "GAS_MASTER_PRO_2026_NASIONAL"; // Harus sama dengan di Backend
 
 let currentUser = JSON.parse(localStorage.getItem('userEJournal')) || null;
